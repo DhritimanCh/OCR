@@ -1,0 +1,13 @@
+# Usage example:
+# OCR("image.jpg")
+
+OCR<-function(x){
+x<-as.character(x)
+library(magick)
+library(magrittr)
+text <- image_read(x) %>%
+  image_resize("2000") %>%
+  image_convert(colorspace = 'gray') %>%
+  image_trim() %>%
+  image_ocr()
+cat(text)}
