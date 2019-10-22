@@ -1,0 +1,9 @@
+#Take a vector and makes a dataframe of dummy variables based on levels of the vector.
+Dummy<-function(x){
+N<-length(levels(factor(x)))
+y<-rep(x,times=N)
+M<-matrix(y,ncol=N,nrow=length(x))
+colnames(M)<-levels(factor(x))
+for(i in 1:N){
+M[,i]<-ifelse(M[,i]==colnames(M)[i],1,0)}
+return(as.data.frame(M))}
