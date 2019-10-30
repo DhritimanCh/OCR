@@ -1,0 +1,34 @@
+#Get your data.
+#Create data frame of fixed variables.
+#Create data frames of variables to be restructured. Take care each data frame should have same number of columns to be made into rows.
+#Make a list of the data frames with first being the Fixed variables data frame.
+#Restructure the list using the function
+#Function creates a resturctured data set with added case index,variable index, key for names of variable levels and saves it as a .csv file.
+
+#Example
+#X<-rep(1:3,100)
+#Y<-rep(4:6,100)
+#Z<-rep(7:9,100)
+#Fixed<-data.frame(F1=rep(c("A","B","C"),100),F2=rep(c("D","E","F"),100))     #Fixed variables as dataframe.
+#D<-data.frame(X,Y,Z)                                                         #Variables to be restructured as data frame.
+#List<-list(Fixed,D)                                                          #List of the data frames.
+#restruc(List)                                                                #Using the function
+
+restruc<-function(x){
+Col<-ncol(x[[2]])
+Row<-nrow(x[[2]])
+Case_Index<-rep(1:Row,Col)
+Key<-rep(names(data.frame(x[2])),each=Row)
+Variable_Index<-as.numeric(factor(Key,levels=names(data.frame(x[2]))))
+Fixed_col<-ncol(x[[1]])
+if(nrow(x[[1]])!=nrow(x[[2]])){stop("Number of rows in data unequal for", deparse(substitute(x[[1]]))," & ",deparse(substitute(x[[2]])))}
+Fixed_data<-apply(x[[1]],MARGIN=2,function(y)rep(y,Col))
+R_Data<-data.frame(Fixed_data,Case_Index,Variable_Index,Key)
+for(i in 2:length(x)){
+Dyndata_colnum<-as.numeric(Fixed_col+2+i)
+Dyn_data<-as.vector(unlist(x[[i]]))
+Name<-as.character(names(data.frame(x[i]))[1])
+R_Data<-data.frame(R_Data,Dyn_data)
+names(R_Data)[Dyndata_colnum]<-Name}
+write.csv(R_Data,file="Restructured Data.csv")
+View(R_Data)}
