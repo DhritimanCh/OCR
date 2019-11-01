@@ -30,5 +30,5 @@ Dyn_data<-as.vector(unlist(x[[i]]))
 Name<-as.character(names(data.frame(x[i]))[1])
 R_Data<-data.frame(R_Data,Dyn_data)
 names(R_Data)[Dyndata_colnum]<-Name}
-write.csv(R_Data,file="Restructured Data.csv")
+write.csv(R_Data,file="Restructured Data.csv",row.names=FALSE)
 View(R_Data)}
