@@ -1,0 +1,46 @@
+#Function to feed in entire data sheet and get descriptives of factors and numerics separately
+#Use as: Desc(Data,Group)
+#Saves the descriptives as text files in working directory.
+
+Desc<-function(data,by){
+#Errors
+if(!is.data.frame(data)){stop("Please provide a data frame as the first argument")}
+if(missing(by)){stop("Please provide grouping variable")}
+if(length(by)!=nrow(data)){stop("Unequal number of rows in data and grouping variable")}
+#Break data sheet into Factor and Numeric
+if(!is.factor(by)){by<-factor(by)}
+Cont<-matrix(NA,nrow=nrow(data),ncol=1)
+Fact<-matrix(NA,nrow=nrow(data),ncol=1)
+for(i in 1:ncol(data)){
+if(is.factor(data[,i])){
+Name<-names(data[i])
+Fact<-data.frame(Fact,data[,i])
+names(Fact)[ncol(Fact)]<-Name}
+else{
+Name<-names(data[i])
+Cont<-data.frame(Cont,data[,i])
+names(Cont)[ncol(Cont)]<-Name}}
+Fact<-Fact[,-1]
+Cont<-Cont[,-1]
+#Descriptives of Numeric
+Cont_Desc<-list()
+for(i in 1:length(levels(by))){
+level_name<-as.character(levels(by)[i])
+D<-Cont[by==level_name,]
+Mean<-round(sapply(D,function(x)mean(x,na.rm=TRUE)),3)
+Stdev<-round(sapply(D,function(x)sd(x,na.rm=TRUE)),3)
+Median<-sapply(D,function(x)median(x,na.rm=TRUE))
+Q1<-sapply(D,function(x)quantile(x,0.25,na.rm=TRUE))
+Q3<-sapply(D,function(x)quantile(x,0.75,na.rm=TRUE))
+Desc<-cbind(Group=level_name,Mean=Mean,Stdev=Stdev,Q1=Q1,Median=Median,Q3=Q3)
+Cont_Desc[[i]]<-Desc}
+#Descriptives  of Factors
+Table<-function(x){
+T<-table(by,x,useNA="no")
+P<-prop.table(T,1)
+Out<-data.frame(T,Prop=P)[,c(1,2,3,6)]
+colnames(Out)<-c(deparse(substitute(by)),"Var","Freq","Prop")
+return(Out)}
+Fact_Desc<-lapply(Fact,Table)
+cat(capture.output(Cont_Desc),file="Continuous Descriptives.txt",sep="\n")
+cat(capture.output(Fact_Desc),file="Factor Descriptives.txt",sep="\n")}
