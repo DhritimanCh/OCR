@@ -1,0 +1,18 @@
+Func<-function(Principal,Interest,Duration,GBInterest){
+library(ggplot2)
+IntPerMonth<-Interest/12
+N<-Duration*12
+EMI<-(Principal*IntPerMonth*((1+IntPerMonth)^N))/(((1+IntPerMonth)^N)-1)
+PrinLeft<-EMI*N
+for(i in 1:N){
+PrinLeft<-c(PrinLeft,round((PrinLeft[i]-EMI),1))}
+GBDeposit<-EMI
+GBPMInt<-GBInterest/12
+for(i in 1:N){
+GBDeposit<-c(GBDeposit,(GBDeposit[i]+EMI)*(1+GBPMInt))}
+Data<-data.frame(Month=c(0:N),Repayment=PrinLeft,Accumulation=GBDeposit,X=rep("X",length(GBDeposit)))
+G<-ggplot(data=Data,aes(x=Month,y=Repayment,group=X))+geom_line(color="red",size=1.2)+geom_line(aes(y=Accumulation),size=1.2,color="darkgreen")+labs(title="Red: Home Loan, Green: Investment",y="Value",x="Month")
+print(G)
+print(Data)}
+
+#Example: Func(5000000,0.07,10,0.062)
