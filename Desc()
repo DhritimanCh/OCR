@@ -20,12 +20,13 @@ else{
 Name<-names(data[i])
 Cont<-data.frame(Cont,data[,i])
 names(Cont)[ncol(Cont)]<-Name}}
-Fact<-Fact[,-1]
-Cont<-Cont[,-1]
+Fact<-data.frame(Fact[,-1])
+Cont<-data.frame(Cont[,-1])
 #Descriptives of Numeric
 Cont_Desc<-list()
 for(i in 1:length(levels(by))){
 level_name<-as.character(levels(by)[i])
+if(is.null(Cont)){next}
 D<-Cont[by==level_name,]
 Mean<-round(sapply(D,function(x)mean(x,na.rm=TRUE)),3)
 Stdev<-round(sapply(D,function(x)sd(x,na.rm=TRUE)),3)
@@ -37,10 +38,19 @@ Cont_Desc[[i]]<-Desc}
 #Descriptives  of Factors
 Table<-function(x){
 T<-table(by,x,useNA="no")
-P<-prop.table(T,1)
+P<-round(prop.table(T,1)*100,2)
 Out<-data.frame(T,Prop=P)[,c(1,2,3,6)]
 colnames(Out)<-c(deparse(substitute(by)),"Var","Freq","Prop")
 return(Out)}
 Fact_Desc<-lapply(Fact,Table)
 cat(capture.output(Cont_Desc),file="Continuous Descriptives.txt",sep="\n")
-cat(capture.output(Fact_Desc),file="Factor Descriptives.txt",sep="\n")}
+cat(capture.output(Fact_Desc),file="Factor Descriptives.txt",sep="\n")
+#P-values by wilcox/kruskal and chisq.test
+if(levels(factor(by))==1){P<-rep("NA",ncol(data))}
+if(levels(factor(by))==2){P<-sapply(data,function(x)ifelse(is.factor(x),round(chisq.test(table(x,by))$p.value,3),round(wilcox.test(x~by)$p.value,3)))}
+if(levels(factor(by))>2){P<-sapply(data,function(x)ifelse(is.factor(x),round(chisq.test(table(x,by))$p.value,3),round(kruskal.test(x~by)$p.value,3)))}
+NAs<-sapply(data,function(x)sum(is.na(x)))
+DataPoints<-sapply(data,function(x)sum(!is.na(x)))
+VarType<-sapply(data,function(x)ifelse(is.factor(x),"Factor","Numeric"))
+POut<-data.frame(VarType,P,NAs,DataPoints)
+cat(capture.output(POut),file="Univariate Desc P-values.txt",sep="\n")}
