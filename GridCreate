@@ -1,0 +1,26 @@
+#GridCreate(HLines=10,VLines=20,HScale=640,VScale=360,Color="gold")
+
+GridCreate<-function(HLines,VLines,HScale,VScale,Color){
+if(missing(HLines)){HLines<-10}
+if(missing(VLines)){VLines<-20}
+if(missing(HScale)|missing(VScale)){
+suppressWarnings(current_resolution <- system("wmic path Win32_VideoController get CurrentHorizontalResolution,CurrentVerticalResolution/format:value",intern = TRUE))
+current_resolution<-strsplit(current_resolution,"=")
+current_resolution<-unlist(current_resolution)
+suppressWarnings(current_resolution<-as.double(current_resolution))
+current_resolution <- current_resolution[!is.na(current_resolution)]
+HScale<-current_resolution[1]
+VScale<-current_resolution[2]
+}
+if(missing(Color)){Color<-"yellow"}
+HLoc<-sapply(c(1:HLines),function(x)x*HScale/HLines)
+VLoc<-sapply(c(1:VLines),function(x)x*VScale/VLines)
+par(bg=NA,mar=c(0,0,0,0))
+plot(1, type = "n", xlab = "",ylab = "", ylim = c(min(HLoc), HScale), xlim = c(min(VLoc), VScale),xaxt="n",yaxt="n",frame.plot=F)
+axis(1, labels=rep("",length(VLoc)),at=VLoc)
+axis(2, labels=rep("",length(HLoc)),at=HLoc)
+abline(v=VLoc,h=HLoc,col=Color,lwd=1.5)
+dev.copy(png,height=VScale,width=HScale,paste0("Grid.png"))
+dev.off()}
+
+
