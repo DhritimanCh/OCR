@@ -1,0 +1,14 @@
+SummaryFunc<-function(x){
+TotRet<-sum(x,na.rm=TRUE)
+MedRet<-median(x,na.rm=TRUE)
+MaxRet<-max(x,na.rm=TRUE)
+MinRet<-min(x,na.rm=TRUE)
+AvgRet<-mean(x,na.rm=TRUE)
+Risk<-sd(x,na.rm=TRUE)
+Sharpe<-AvgRet/Risk
+NumWin<-length(x[x>0&!is.na(x)])
+NumLoss<-length(x[x<0&!is.na(x)])
+TotTrade<-length(x[!is.na(x)])
+Names<-c("Total.Return","Median.Return","Max.Return","Max.Loss","Average.Return","Risk","Sharpe","NumWins","NumLoss","Total.Trades")
+Vars<-c(TotRet,MedRet,MaxRet,MinRet,AvgRet,Risk,Sharpe,NumWin,NumLoss,TotTrade)
+print(cbind(Names,Vars))}
