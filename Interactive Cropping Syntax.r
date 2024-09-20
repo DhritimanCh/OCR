@@ -158,27 +158,34 @@ DataClean<-do.call(data.frame,lapply(DataClean,Interpolate))
 DataClean$Prx<-runner::runner(data.frame(DataClean$MAP,DataClean$ICP),k=60,function(x)cor(x[,1],x[,2],use="pairwise.complete.obs"),na_pad=TRUE)
 DataClean$CPP<-unlist(DataClean$MAP)-unlist(DataClean$ICP)
 
+###########Saving data
+
+write.csv(DataClean,"Extracted Data.csv")
+
 ########### Make Graphs
 
 DataClean$PrxBins<-cut(DataClean$Prx,breaks=seq(-1,1,0.2))
+DataClean<-DataClean[complete.cases(DataClean),]
+
+if(length(unique(sign(DataClean$Prx)))==3){Col<-c("darkgreen","yellow","red")}
+if(length(unique(sign(DataClean$Prx)))<3){Col<-c("darkgreen","red")}
+
 jpeg("PRX CPP Graph.jpg",height=6,width=6,units="in",res=250)
-G<-ggplot(data=DataClean[complete.cases(DataClean),],aes(x=PrxBins,y=CPP,fill=factor(sign(Prx))))+geom_boxplot(color="black")+scale_fill_manual(values=c("darkgreen","red"))+labs(fill="PRX Sign",x="PRX")+theme_bw()
+G<-ggplot(data=DataClean[complete.cases(DataClean),],aes(x=PrxBins,y=CPP,fill=factor(sign(Prx))))+geom_boxplot(color="black")+scale_fill_manual(values=Col)+labs(fill="PRX Sign",x="PRX")+theme_bw()
 print(G)
 dev.off()
 
 jpeg("PRX CPP Scatter.jpg",height=6,width=6,units="in",res=250)
-G<-ggplot(data=DataClean[complete.cases(DataClean),],aes(x=Prx,y=CPP))+geom_point(aes(color=factor(sign(Prx))),size=1.5)+scale_color_manual(values=c("darkgreen","red"))+labs(color="PRX Sign",x="PRX")+theme_bw()+geom_smooth(color="blue",size=1.2)+geom_smooth(method="lm",color="black",size=1.2)
+G<-ggplot(data=DataClean[complete.cases(DataClean),],aes(x=Prx,y=CPP))+geom_point(aes(color=factor(sign(Prx))),size=1.5)+scale_color_manual(values=Col)+labs(color="PRX Sign",x="PRX")+theme_bw()+geom_smooth(color="blue",size=1.2)+geom_smooth(method="lm",color="black",size=1.2)
 print(G)
 dev.off()
 
 jpeg("PRX MAP Scatter.jpg",height=6,width=6,units="in",res=250)
-G<-ggplot(data=DataClean[complete.cases(DataClean),],aes(x=Prx,y=MAP))+geom_point(aes(color=factor(sign(Prx))),size=1.5)+scale_color_manual(values=c("darkgreen","red"))+labs(color="PRX Sign",x="PRX")+theme_bw()+geom_smooth(color="blue",size=1.2)+geom_smooth(method="lm",color="black",size=1.2)
+G<-ggplot(data=DataClean[complete.cases(DataClean),],aes(x=Prx,y=MAP))+geom_point(aes(color=factor(sign(Prx))),size=1.5)+scale_color_manual(values=Col)+labs(color="PRX Sign",x="PRX")+theme_bw()+geom_smooth(color="blue",size=1.2)+geom_smooth(method="lm",color="black",size=1.2)
 print(G)
 dev.off()
 
-###########Saving data
 
-write.csv(DataClean,"Extracted Data.csv")
 
 
 
