@@ -96,7 +96,7 @@ Channel<-ColorList[IntensityList==max(IntensityList)]
 ParaChannel[[z]]<-Channel}
 
 ####Initiating Numeric extraction
-readline("Initiating Numeric extraction. (Press Enter) \n\n\n")
+readline("Initiating Numeric extraction. (Press Enter) \n\n")
 
 ParameterList<-data.frame(matrix(rep(NA,ParaNum),ncol=ParaNum,nrow=1))
 names(ParameterList)<-ParaNames
@@ -158,8 +158,27 @@ DataClean<-do.call(data.frame,lapply(Data,Clean))
 DataClean<-do.call(data.frame,lapply(DataClean,Clean))#Repeat clean if too high or too low values persist
 DataClean<-do.call(data.frame,lapply(DataClean,Interpolate))
 
-######Save data
+###### Cors Calculation
+
+Input<-menu(c("Yes","No"),title=paste0("Do you want calculate running window correlations?\n")) + 1
+if (Input == 2){
+CorNum<-readline("How many variables do you want to compute?\n")
+CorNum<-as.numeric(CorNum)
+for(i in 1:CorNum){
+print(names(DataClean))
+Var1<-readline("Please type the exact name of the 1st variable.\n")
+Var2<-readline("Please type the exact name of the 2nd variable.\n")
+Window<-readline("Please type the length of running window for correlation.\n")
+Window<-as.numeric(Window)
+if(is.na(Window)){Window<-readline("Error in window length. Please type the length of running window for correlation (numeric).\n")
+Window<-as.numeric(Window)}
+VarName<-readline("Please type the name of the variable to be computed.\n")
+DataClean[VarName]<-runner::runner(data.frame(DataClean[Var1],DataClean[Var2]),k=Window,function(x)cor(x[,1],x[,2],use="pairwise.complete.obs"),na_pad=TRUE)
+next}}
+if (Input == 3){
+message(paste0('No variables computed. Save file in next step.\n'))}
 
 Prompt<-readline("Please type the name of the file to be saved.\n")
-
 write.csv(DataClean,file=paste0(Prompt,".csv"),row.names=FALSE)
+
+
